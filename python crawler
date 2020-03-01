@@ -1,0 +1,65 @@
+'''This is a module'''
+
+import re
+from urllib import request
+
+import pdb
+pdb.set_trace()
+
+class Spider:
+    '''This is a class'''
+    url='https://www.bilibili.com/v/music/original/?spm_id_from=333.5.b_7072696d6172795f6d656e75.24#/all/click/0/1/2020-02-06,2020-02-13'
+    root_pattern='<div class="r">([\s\S]*?)</div>'
+    name_pattern='<div class="up-info">([\s\S]*?)</div>'
+    number_pattern='<span class="v-info-i">([\s\S]*?)</span>'
+    
+    def __fetch_content(self):
+        r=request.urlopen(Spider.url)
+        htmls=r.read()
+        htmls=str(htmls,encoding='utf-8')
+        return htmls
+        
+    def __analysis(self,htmls):
+        root_html=re.findall(Spider.root_pattern,htmls)#正则表达式
+        
+        anchors=[]
+        for html in root_html:
+            name=re.findall(Spider.name_pattern,html)
+            number=re.findall(Spider.number_pattern,html)
+            anchor={'name':name,'number':number}
+            anchors.append(anchor)
+        print(anchors[0])
+        
+        return anchors
+        
+    def __refine(self,anchors):
+        l=lambda anchor:{'name':anchor['name'][0].strip(),
+                        'number':anchor['number'][0]}
+        return map(1,anchors)
+    
+    def __sort(self,anchors):#sorted排序
+            anchors=sorted(anchors,key=self.__sort_seed,reverse=True)
+            return anchors
+        
+    def __sort_seed(self,anchor):
+        r=re.findall('\d*',anchor['number'])
+        number=float(r[0])
+        if '万' in anchor['number']:
+            number*=10000
+        return number
+            
+    def __show(self,anchors):
+        for rank in range(0,len(anchors)):
+            print('rank'+str(rank+1)+':'+anchors[rank]['name']
+                 +'    '+anchors[rank]['number'])
+        
+    
+    def go(self):
+        htmls=self.__fetch_content()
+        anchors=self.__analysis(htmls)
+        anchors=list(self.__refine(anchors))
+        anchors=self.__sort(anchors)
+        self.__show(anchors)
+
+spider=Spider()
+spider.go()
