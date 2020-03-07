@@ -6,7 +6,7 @@ from urllib import request
 import pdb
 pdb.set_trace()
 
-class Spider:
+class Spider():
     '''This is a class'''
     url='https://www.bilibili.com/v/music/original/?spm_id_from=333.5.b_7072696d6172795f6d656e75.24#/all/click/0/1/2020-02-06,2020-02-13'
     root_pattern='<div class="r">([\s\S]*?)</div>'
